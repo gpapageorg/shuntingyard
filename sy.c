@@ -13,17 +13,20 @@ void push(char, char *, int *);
 char pop(char *, int *);
 bool isop(char);
 bool associativity(char);
+void read_text(char *);
 
 
 int main()
 {
-    char *output;
+    char *output, *input;
     output = malloc(STRING_SIZE);
+    input = malloc(STRING_SIZE);
 
-    char in[] = "3+4*2/(1-5)^2^3";
 
-    read_expression(in, output);
-    printf("%s", output);
+    //char in[] = "3+4*2/(1-5)^2^3";
+    read_text(input);
+    read_expression(input, output);
+    printf("%s\n", output);
 
 }
 
@@ -46,7 +49,6 @@ bool check_precedence(char f_o, char s_o)
 void read_expression(char *input, char *output)
 {
     char *operator_stack = malloc(STACK_SIZE);
-    char ch;
     int top = -1;
     int pos = 0, out_pos = 0;
     push('\0', operator_stack, &top);
@@ -85,14 +87,14 @@ void read_expression(char *input, char *output)
         {
             while(operator_stack[top] != '\0' && operator_stack[top] != '(')
             {
-                ch = pop(operator_stack, &top);
-                if(ch == '\0')
+                output[out_pos++] = pop(operator_stack, &top);
+
+                if(operator_stack[top] == '\0')
                 {
-                    printf("Mismatched Parentheses");
-                    return;
+                    printf("Mismatched Parentheses.\n");
+                    exit(-1);
                 }
-                output[out_pos++] = ch;
-                    
+                
             }
 
            pop(operator_stack, &top);
@@ -102,6 +104,8 @@ void read_expression(char *input, char *output)
 
     while (operator_stack[top] != '\0')
         output[out_pos++] = pop(operator_stack, &top);
+    
+    free(operator_stack);
     
 }
 
@@ -132,4 +136,15 @@ bool associativity(char op)
         return false;
     else
         return true;
+}
+
+void read_text(char *input)
+{
+    char ch;
+    int i = 0;
+
+    while(ch = getchar(), ch != '\n')
+        input[i++] = ch;
+
+    return;
 }
