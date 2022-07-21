@@ -14,6 +14,7 @@ char pop(char *, int *);
 bool isop(char);
 bool associativity(char);
 void read_text(char *);
+int isnum(char *, int);
 
 
 int main()
@@ -50,20 +51,31 @@ void read_expression(char *input, char *output)
 {
     char *operator_stack = malloc(STACK_SIZE);
     int top = -1;
-    int pos = 0, out_pos = 0;
+    int pos = 0, out_pos = 0, len = 0;
     push('\0', operator_stack, &top);
 
     while(input[pos] != '\0')
     {
         if(isdigit(input[pos]))
-            output[out_pos++] = input[pos];
+        {
+            len = isnum(input,pos);
+            //printf("%d\n", len);
+            for (int i = 0; i < len; i++)
+            {
+                output[out_pos] = input[pos];
 
+                pos++;
+                out_pos++;
+                
+            }
+            //printf("%c", input[pos]);
+        }
         else if(isop(input[pos]))
         {
 
            if(operator_stack[top] == '\0')
             {
-                push(input[pos], operator_stack, &top);
+                push(input[pos++], operator_stack, &top);
             // printf("%c, %d",operator_stack[top], top);
 
             }
@@ -75,13 +87,13 @@ void read_expression(char *input, char *output)
                     output[out_pos++] = pop(operator_stack, &top);
                 }
 
-                push(input[pos],operator_stack, &top);
+                push(input[pos++],operator_stack, &top);
 
             }
         }
         
         else if (input[pos] == '(')
-            push(input[pos], operator_stack, &top);
+            push(input[pos++], operator_stack, &top);
         
         else if(input[pos] == ')')
         {
@@ -97,9 +109,9 @@ void read_expression(char *input, char *output)
                 
             }
 
-           pop(operator_stack, &top);
+            pop(operator_stack, &top);
+            pos ++;
         }
-        pos ++;
     }
 
     while (operator_stack[top] != '\0')
@@ -147,4 +159,15 @@ void read_text(char *input)
         input[i++] = ch;
 
     return;
+}
+
+int isnum(char *input, int pos)
+{
+    int len = 0;
+    while(!isop(input[pos]) && input[pos] != '\0')
+    {
+        len++;
+        (pos)++;
+    }
+    return len;
 }
